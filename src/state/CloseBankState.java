@@ -5,14 +5,15 @@ import core.State;
 import org.osbot.rs07.script.MethodProvider;
 
 public final class CloseBankState extends State {
+
     private static boolean escapeExit = true;
 
-    public CloseBankState(Core ddd2) {
-        super(ddd2);
+    public CloseBankState(Core parent) {
+        super(parent);
     }
 
     @Override
-    public final boolean shouldExecute() {
+    public boolean shouldExecute() {
         if (!this.parent.bank.isOpen()) {
             return false;
         }
@@ -25,12 +26,12 @@ public final class CloseBankState extends State {
     }
 
     @Override
-    public final String getTextualState() {
+    public String getTextualState() {
         return "Closing Bank";
     }
 
     @Override
-    public final boolean onLoop() throws InterruptedException {
+    public boolean onLoop() throws InterruptedException {
         if (escapeExit) {
             this.parent.getKeyboard().typeKey('\u001b');
             new WaitForBankCloseCondition(this).sleep();

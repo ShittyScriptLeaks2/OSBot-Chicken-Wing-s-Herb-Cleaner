@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0_110.
- */
 package ui;
 
 import javax.swing.*;

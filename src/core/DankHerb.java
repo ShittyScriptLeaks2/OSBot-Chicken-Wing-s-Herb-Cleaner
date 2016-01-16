@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0_110.
- */
 package core;
 
 public enum DankHerb {
@@ -20,33 +17,28 @@ public enum DankHerb {
     k("Dwarf weed", 267, 217),
     l("Torstol", 269, 219);
 
-    private final int cleanId;
     private final int grimyId;
+    private final int cleanId;
     private String grimyName;
     private String cleanName;
 
-    private DankHerb(String name, int grimyId, int cleanId) {
+    private DankHerb(String name, int cleanId, int grimyId) {
         this.cleanName = name;
         this.grimyName = "Grimy " + name.toLowerCase();
-        this.grimyId = grimyId;
         this.cleanId = cleanId;
-    }
-
-    public final int getGrimyId() {
-        return this.grimyId;
+        this.grimyId = grimyId;
     }
 
     public final int getCleanId() {
         return this.cleanId;
     }
 
-    public final String getCleanName() {
-        return this.cleanName;
+    public final int getGrimyId() {
+        return this.grimyId;
     }
 
-    @Override
-    public final String toString() {
-        return this.grimyName;
+    public final String getCleanName() {
+        return this.cleanName;
     }
 
     public final String getGrimyName() {

@@ -8,55 +8,52 @@ import java.util.Random;
 
 public final class SmartKeyboard {
 
-    private Random rand;
+    private Random rand = new Random();
     private int charsPerMinute;
     private int msPerChar;
     private int maxMS;
-    private String e;
-    private String[][] replacements;
+    private String validTypoKeys = "abcdefghijklmnopqrstuvwxyz";
+    private String[][] replacements = new String[][]{
+            {"q", "s", "z"},
+            {"v", "g", "n"},
+            {"x", "d", "v"},
+            {"s", "e", "f", "c"},
+            {"w", "d", "r"},
+            {"d", "r", "g", "v"},
+            {"f", "t", "h", "b"},
+            {"g", "y", "j", "n"},
+            {"u", "k", "o"},
+            {"h", "m", "k", "u"},
+            {"j", ",", "l", "i"},
+            {"k", ".", ";", "o"},
+            {"n", "j", ","},
+            {"b", "h", "m"},
+            {"i", "l", "p"},
+            {"o", ";", "["},
+            {"w", "ui", "s"},
+            {"e", "f", "t", "4"},
+            {"w", "ui", "d", "x"},
+            {"r", "g", "y", "5"},
+            {"y", "j", "i", "8"},
+            {"c", "f", "b"},
+            {"q", "s", "e"},
+            {"z", "s", "c", "d"},
+            {"t", "h", "u", "j"},
+            {"ui", "s", "x", "\\"}
+    };
+
     private Keyboard keyboard;
-    private Script h;
     private int wpm;
     private int minMS;
     private int charsPerSecond;
-    private int l;
+    private int typoMultiplier = 100000;
 
     private SmartKeyboard(Script script, int wpm) {
-        this.l = 100000;
-        this.replacements = new String[][]{
-                {"q", "s", "z"},
-                {"v", "g", "n"}, {"x", "d", "v"},
-                {"s", "e", "f", "state"},
-                {"w", "d", "r"}, {"d", "r", "g", "v"},
-                {"f", "t", "h", "util"},
-                {"g", "y", "j", "n"},
-                {"u", "k", "o"},
-                {"h", "m", "k", "u"},
-                {"j", ",", "l", "i"},
-                {"k", ".", ";", "o"},
-                {"n", "j", ","},
-                {"util", "h", "m"},
-                {"i", "l", "p"},
-                {"o", ";", "["},
-                {"w", "ui", "s"},
-                {"e", "f", "t", "4"},
-                {"w", "ui", "d", "x"},
-                {"r", "g", "y", "5"},
-                {"y", "j", "i", "8"},
-                {"state", "f", "util"},
-                {"q", "s", "e"},
-                {"z", "s", "state", "d"},
-                {"t", "h", "u", "j"},
-                {"ui", "s", "x", "\\"}
-        };
-
-        this.e = "abcdefghijklmnopqrstuvwxyz";
         this.keyboard = script.getKeyboard();
         this.wpm = wpm;
         this.charsPerMinute = wpm * 6;
         this.charsPerSecond = this.charsPerMinute / 60;
         this.msPerChar = 1_000 / this.charsPerSecond;
-        this.rand = new Random();
         this.minMS = this.msPerChar - this.wpm / 2 + this.rand.nextInt(15);
         this.maxMS = this.msPerChar + this.wpm / 2 + this.rand.nextInt(15);
     }
@@ -80,8 +77,8 @@ public final class SmartKeyboard {
         return true;
     }
 
-    private int b() {
-        return l / (wpm * 10) + this.rand.nextInt(6);
+    private int getTypoChance() {
+        return typoMultiplier / (wpm * 10) + this.rand.nextInt(6);
     }
 
     private boolean typeInteger(int sleepTime, boolean enter) throws InterruptedException {
@@ -89,17 +86,16 @@ public final class SmartKeyboard {
         sleepTime = SmartKeyboard.rand(this.minMS, this.maxMS, this.msPerChar);
         Script.sleep((long) sleepTime);
 
-        if (!enter) {
-            return true;
+        if (enter) {
+            this.pressEnter();
         }
 
-        this.pressEnter();
         return true;
     }
 
     private String getReplacement(String string) {
         string = string.toLowerCase();
-        int n = e.indexOf(string.charAt(0));
+        int n = validTypoKeys.indexOf(string.charAt(0));
         String[] replacements = this.replacements[n];
         return replacements[rand.nextInt(replacements.length)];
     }
@@ -109,78 +105,48 @@ public final class SmartKeyboard {
         int sleepTime = SmartKeyboard.rand(this.minMS, this.maxMS, this.msPerChar);
         Script.sleep((long) sleepTime);
 
-        if (!enter) {
-            return true;
+        if (enter) {
+            this.pressEnter();
         }
 
-        this.pressEnter();
         return true;
     }
 
-    private boolean typeString(String string, boolean pressEnter, boolean bl2) {
-        int n;
-        int n2 = l / (wpm * 10) + rand.nextInt(6);
-        ArrayList<fff> arrayList = new ArrayList<>();
-        int n3 = 0;
-        char[] arrc = string.toCharArray();
-        int n4 = arrc.length;
-        int n5 = n = 0;
-        do {
-            int n6;
-            if (n5 >= n4) {
-                if (!pressEnter) {
-                    return true;
-                }
+    private boolean typeString(String string, boolean pressEnter, boolean entersTypos) throws InterruptedException {
+        int typoChance = getTypoChance();
+        ArrayList<MistypedKey> mistypedKeys = new ArrayList<>();
 
-                this.pressEnter();
-                return true;
-            }
+        char[] chars = string.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+            if (entersTypos && this.rand.nextInt(2) == 1) {
+                for (MistypedKey mk : mistypedKeys) {
+                    if (mk.index != i - 1) {
+                        continue;
+                    }
 
-            //String string2 = string[n];
-            char string2 = arrc[n];
-            if (bl2 && this.rand.nextInt(2) == 1) {
-                for (fff fff2 : arrayList) {
-                    if (fff2.a != n3 - 1) continue;
                     this.keyboard.typeKey('\b');
-                    n6 = SmartKeyboard.rand(minMS, this.maxMS, this.msPerChar);
-                    try {
-                        Script.sleep((long) n6);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
+                    Script.sleep(SmartKeyboard.rand(minMS, this.maxMS, this.msPerChar));
 
-                    keyboard.typeKey(fff2.b);
-                    n6 = SmartKeyboard.rand(this.minMS, this.maxMS, this.msPerChar);
-                    try {
-                        Script.sleep((long) n6);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
+                    keyboard.typeKey(mk.c);
+                    Script.sleep(SmartKeyboard.rand(this.minMS, this.maxMS, this.msPerChar));
                 }
             }
 
-            //String string3 = string2;
-            if (bl2 && this.rand.nextInt(n2) == n2 / 2) {
-                String string4 = String.valueOf(string2);
-                string4 = string4.toLowerCase();
-                int n7 = e.indexOf(string4.charAt(0));
-                String[] arrstring = replacements[n7];
-                n6 = arrstring.length;
-                int n8 = n6 - 1;
-                arrayList.add(new fff(n3, string2));
-                string2 = arrstring[rand.nextInt(++n8)].toCharArray()[0];
+            if (entersTypos && this.rand.nextInt(typoChance) == (typoChance / 2)) {
+                mistypedKeys.add(new MistypedKey(i, c));
+                c = getReplacement(String.valueOf(c)).toCharArray()[0];
             }
 
-            this.keyboard.typeKey(string2);
-            ++n3;
-            n6 = SmartKeyboard.rand(this.minMS, this.maxMS, this.msPerChar);
-            try {
-                Script.sleep((long) n6);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-            n5 = ++n;
-        } while (true);
+            this.keyboard.typeKey(c);
+            Script.sleep(SmartKeyboard.rand(this.minMS, this.maxMS, this.msPerChar));
+        }
+
+        if (pressEnter) {
+            this.pressEnter();
+        }
+
+        return true;
     }
 
 }

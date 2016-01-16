@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0_110.
- */
 package ui;
 
 import core.DankHerb;
@@ -12,23 +9,23 @@ import java.util.Hashtable;
 public final class MainFrame extends JFrame {
 
     private DankHerb selectedHerb;
-    private SelectPatternFrame b;
-    private int c;
+    private SelectPatternFrame selectPatternFrame;
+    private int cleanDelay;
     private JLabel d;
-    private int[] e;
+    private int[] defaultCleanPattern;
     private boolean f;
-    private int[] g;
+    private int[] cleanPattern;
 
     public MainFrame() {
         super("Settings");
         MainFrame ddd2 = this;
         MainFrame ddd3 = this;
 
-        this.c = 0;
+        this.cleanDelay = 0;
         this.selectedHerb = DankHerb.a;
         this.f = true;
-        ddd3.e = new int[]{0, 1, 4, 5, 8, 9, 12, 13, 16, 17, 20, 21, 24, 25, 2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27};
-        ddd3.g = this.e;
+        ddd3.defaultCleanPattern = new int[]{0, 1, 4, 5, 8, 9, 12, 13, 16, 17, 20, 21, 24, 25, 2, 3, 6, 7, 10, 11, 14, 15, 18, 19, 22, 23, 26, 27};
+        ddd3.cleanPattern = this.defaultCleanPattern;
         ddd3.d = new JLabel("No custom pattern set");
         ddd2.setLocationRelativeTo(null);
         ddd2.setDefaultCloseOperation(2);
@@ -39,9 +36,9 @@ public final class MainFrame extends JFrame {
         return frame.d;
     }
 
-    static int[] a(MainFrame frame, int[] arrn) {
-        frame.g = arrn;
-        return frame.g;
+    static int[] setCleanPattern(MainFrame frame, int[] pattern) {
+        frame.cleanPattern = pattern;
+        return frame.cleanPattern;
     }
 
     static boolean a(MainFrame frame, boolean bl) {
@@ -49,27 +46,26 @@ public final class MainFrame extends JFrame {
         return frame.f;
     }
 
-    static SelectPatternFrame b(MainFrame frame) {
-        return frame.b;
+    static int setCleanDelay(MainFrame parent, int delay) {
+        parent.cleanDelay = delay;
+        return parent.cleanDelay;
     }
 
-    static SelectPatternFrame a(MainFrame ddd2, SelectPatternFrame coN2) {
-        ddd2.b = coN2;
-        return ddd2.b;
-    }
-
-    static int setCleanDelay(MainFrame parent, int n) {
-        parent.c = n;
-        return parent.c;
-    }
-
-    static int[] c(MainFrame ddd2) {
-        return ddd2.e;
+    static int[] getDefaultCleanPattern(MainFrame frame) {
+        return frame.defaultCleanPattern;
     }
 
     static DankHerb setSelectedHerb(MainFrame frame, DankHerb herb) {
         frame.selectedHerb = herb;
         return frame.selectedHerb;
+    }
+
+    public SelectPatternFrame getSelectPatternFrame() {
+        return this.selectPatternFrame;
+    }
+
+    public void setSelectPatternFrame(SelectPatternFrame frame) {
+        this.selectPatternFrame = frame;
     }
 
     private boolean d() {
@@ -137,12 +133,12 @@ public final class MainFrame extends JFrame {
         this.pack();
     }
 
-    public final int[] a() {
-        return this.g;
+    public final int[] getCleanPattern() {
+        return this.cleanPattern;
     }
 
-    public final int b() {
-        return this.c;
+    public final int getCleanDelay() {
+        return this.cleanDelay;
     }
 
     public final DankHerb getSelectedHerb() {

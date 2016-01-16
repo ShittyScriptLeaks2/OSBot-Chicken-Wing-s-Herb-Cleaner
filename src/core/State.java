@@ -1,11 +1,8 @@
-/*
- * Decompiled with CFR 0_110.
- */
 package core;
 
 public abstract class State {
 
-    public Core parent;
+    public final Core parent;
 
     public State(Core parent) {
         this.parent = parent;

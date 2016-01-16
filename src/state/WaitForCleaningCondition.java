@@ -4,7 +4,7 @@ import org.osbot.rs07.utility.ConditionalSleep;
 
 public final class WaitForCleaningCondition extends ConditionalSleep {
 
-    private CleanHerbsState parent;
+    private final CleanHerbsState parent;
 
     public WaitForCleaningCondition(CleanHerbsState parent) {
         super(2000);
@@ -12,7 +12,7 @@ public final class WaitForCleaningCondition extends ConditionalSleep {
 
     }
 
-    public final boolean condition() {
+    public boolean condition() {
         if (this.parent.parent.inventory.contains(this.parent.parent.getCleanHerbName())) {
             return false;
         }

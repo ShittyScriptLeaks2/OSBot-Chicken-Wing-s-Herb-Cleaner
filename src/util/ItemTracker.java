@@ -1,13 +1,3 @@
-/*
- * Decompiled with CFR 0_110.
- * 
- * Could not load the following classes:
- *  org.osbot.rs07.Bot
- *  org.osbot.rs07.api.Inventory
- *  org.osbot.rs07.api.model.Item
- *  org.osbot.rs07.event.ScriptExecutor
- *  org.osbot.rs07.script.Script
- */
 package util;
 
 import org.osbot.rs07.api.Inventory;
@@ -57,9 +47,9 @@ public abstract class ItemTracker extends Thread {
         while (this.script.getBot().getScriptExecutor().isRunning()) {
             Inventory inventory = this.script.getInventory();
             if (inventory != null) {
-                previousItems.clear();
-                previousItems.putAll(currentItems);
-                currentItems.clear();
+                this.previousItems.clear();
+                this.previousItems.putAll(currentItems);
+                this.currentItems.clear();
                 Item[] items = inventory.getItems();
                 for (Item item : items) {
                     if (item != null) {
@@ -79,5 +69,6 @@ public abstract class ItemTracker extends Thread {
             }
         }
     }
+
 }
 

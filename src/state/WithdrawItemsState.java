@@ -6,26 +6,26 @@ import org.osbot.rs07.script.MethodProvider;
 
 public final class WithdrawItemsState extends State {
 
-    public WithdrawItemsState(Core ddd2) {
-        super(ddd2);
+    public WithdrawItemsState(Core parent) {
+        super(parent);
     }
 
     @Override
-    public final boolean onLoop() throws InterruptedException {
+    public boolean onLoop() throws InterruptedException {
         this.parent.bank.withdrawAll(this.parent.getCleanHerbName());
         MethodProvider.sleep((long) MethodProvider.random(10, 50));
 
-        new WithdrawGrimyHerbsCondition(this).sleep();
+        new WithdrawHerbsCondition(this).sleep();
         return true;
     }
 
     @Override
-    public final String getTextualState() {
-        return new StringBuilder().insert(0, "Withdrawing ").append(this.parent.getCleanHerbName()).toString();
+    public String getTextualState() {
+        return "Withdrawing " + this.parent.getCleanHerbName();
     }
 
     @Override
-    public final boolean shouldExecute() {
+    public boolean shouldExecute() {
         if (!this.parent.bank.isOpen()) {
             return false;
         }

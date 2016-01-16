@@ -11,7 +11,7 @@ public final class OpenBankState extends State {
     }
 
     @Override
-    public final boolean shouldExecute() {
+    public boolean shouldExecute() {
         if (this.parent.bank.isOpen()) {
             return false;
         }
@@ -24,28 +24,27 @@ public final class OpenBankState extends State {
     }
 
     @Override
-    public final String getTextualState() {
+    public String getTextualState() {
         return "Opening Bank";
     }
 
     @Override
-    public final boolean onLoop() {
+    public boolean onLoop() {
         try {
-            Entity entity = this.parent.objects.closest("Bank booth");
-            if (entity == null || !entity.isVisible()) {
-                entity = this.parent.objects.closest("Grand Exchange booth");
+            Entity booth = this.parent.objects.closest("Bank booth");
+            if (booth == null || !booth.isVisible()) {
+                booth = this.parent.objects.closest("Grand Exchange booth");
             }
 
-            if (entity == null || !entity.isVisible()) {
-                entity = this.parent.objects.closest("Bank chest");
+            if (booth == null || !booth.isVisible()) {
+                booth = this.parent.objects.closest("Bank chest");
             }
 
-            if (entity != null) {
-                entity.interact("Bank");
+            if (booth != null) {
+                booth.interact("Bank");
             }
 
             new WaitForBankOpenCondition(this).sleep();
-            return true;
         } catch (NullPointerException v0) {
             this.parent.log("RELOG");
         }

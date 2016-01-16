@@ -12,8 +12,8 @@ public final class InstantCloseListener extends WindowAdapter {
     }
 
     @Override
-    public final void windowClosing(WindowEvent windowEvent) {
-        Core.getMainFrame(this.parent).setVisible(false);
+    public void windowClosing(WindowEvent windowEvent) {
+        parent.getMainFrame().setVisible(false);
     }
 
 }

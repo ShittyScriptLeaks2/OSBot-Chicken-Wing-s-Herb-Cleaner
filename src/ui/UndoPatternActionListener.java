@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0_110.
- */
 package ui;
 
 import javax.swing.*;
@@ -8,24 +5,24 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-final class UndoPatternActionListener implements ActionListener {
+public final class UndoPatternActionListener implements ActionListener {
 
-    private SelectPatternFrame a;
+    private final SelectPatternFrame parent;
 
-    public UndoPatternActionListener(SelectPatternFrame coN2) {
-        this.a = coN2;
+    public UndoPatternActionListener(SelectPatternFrame parent) {
+        this.parent = parent;
     }
 
     @Override
     public final void actionPerformed(ActionEvent serializable) {
-        if (SelectPatternFrame.getPatternStack(this.a).isEmpty()) {
+        if (SelectPatternFrame.getPatternStack(this.parent).isEmpty()) {
             return;
         }
 
-        ImageLabel label = SelectPatternFrame.getIndexToLabelMap(this.a).get(SelectPatternFrame.getPatternStack(this.a).pop());
+        ImageLabel label = SelectPatternFrame.getIndexToLabelMap(this.parent).get(SelectPatternFrame.getPatternStack(this.parent).pop());
         label.setSelected(false);
         label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        SelectPatternFrame.d(this.a).remove(SelectPatternFrame.d(this.a).size() - 1);
+        SelectPatternFrame.d(this.parent).remove(SelectPatternFrame.d(this.parent).size() - 1);
     }
 
 }

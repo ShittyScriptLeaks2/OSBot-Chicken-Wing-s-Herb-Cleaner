@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0_110.
- */
 package ui;
 
 import javax.swing.*;
@@ -14,29 +11,26 @@ import java.util.Stack;
 
 public class SelectPatternFrame extends JFrame {
 
-    private static final long a = 1121340224391950561L;
-    private DefaultListModel b = new DefaultListModel();
+    private DefaultListModel<Integer> b = new DefaultListModel<>();
     private HashMap<ImageLabel, Integer> labelToIndexMap = new HashMap<>();
-    private JPanel d;
     private Stack<Integer> patternStack = new Stack<>();
     private HashMap<Integer, ImageLabel> indexToLabelMap = new HashMap<>();
-    private JButton doneButton;
-    private EventListenerList h = new EventListenerList();
+    private EventListenerList eventListeners = new EventListenerList();
 
     public SelectPatternFrame() {
         this.setDefaultCloseOperation(0);
         this.setBounds(100, 100, 210, 460);
-        this.d = new JPanel();
-        this.d.setBorder(new EmptyBorder(5, 5, 5, 5));
-        this.setContentPane(this.d);
-        this.d.setLayout(new BorderLayout(0, 0));
+        JPanel d = new JPanel();
+        d.setBorder(new EmptyBorder(5, 5, 5, 5));
+        this.setContentPane(d);
+        d.setLayout(new BorderLayout(0, 0));
         JPanel var1 = new JPanel();
-        this.d.add(var1, "Center");
+        d.add(var1, "Center");
         var1.setLayout(new GridLayout(7, 4, 0, 0));
         JPanel var2 = new JPanel();
-        this.d.add(var2, "North");
+        d.add(var2, "North");
         var2.setLayout(new BorderLayout(0, 0));
-        JList var6 = new JList(this.b);
+        JList<Integer> var6 = new JList<>(this.b);
         var6.setSelectionMode(0);
         var6.setLayoutOrientation(0);
         var6.setVisibleRowCount(4);
@@ -52,7 +46,7 @@ public class SelectPatternFrame extends JFrame {
 
         JPanel var4 = new JPanel(new FlowLayout());
         var2.add(var4);
-        this.d.add(var2, "South");
+        d.add(var2, "South");
 
         JButton undoButton = new JButton("Reset");
         var3.add(undoButton);
@@ -62,9 +56,9 @@ public class SelectPatternFrame extends JFrame {
         var3.add(resetButton);
         resetButton.addActionListener(new UndoPatternActionListener(this));
 
-        this.doneButton = new JButton("Done");
-        var4.add(this.doneButton);
-        this.doneButton.addActionListener(new DoneWithPatternActionListener(this));
+        JButton doneButton = new JButton("Done");
+        var4.add(doneButton);
+        doneButton.addActionListener(new DoneWithPatternActionListener(this));
 
         URL var9 = null;
         try {
@@ -100,28 +94,22 @@ public class SelectPatternFrame extends JFrame {
         return coN2.labelToIndexMap;
     }
 
-    static DefaultListModel d(SelectPatternFrame coN2) {
+    static DefaultListModel<Integer> d(SelectPatternFrame coN2) {
         return coN2.b;
     }
 
-    public final void a(PatternEventObject obj) {
-        int n;
-        Object[] arrobject = this.h.getListenerList();
-        int n2 = n = 0;
-        while (n2 < arrobject.length) {
-            if (arrobject[n] == jjj.class) {
-                ((jjj) arrobject[n + 1]).a(obj);
+    public final void fireEvent(PatternEventObject obj) {
+        Object[] arr = this.eventListeners.getListenerList();
+        for (int i = 0; i < arr.length; i += 2) {
+            if (arr[i] == PatternEventListener.class) {
+                ((PatternEventListener) arr[i + 1]).callback(obj);
             }
-            n2 = n += 2;
         }
     }
 
-    private void b(jjj jjj2) {
-        this.h.remove(jjj.class, jjj2);
+    public final void addEventListener(PatternEventListener listener) {
+        this.eventListeners.add(PatternEventListener.class, listener);
     }
 
-    public final void a(jjj jjj2) {
-        this.h.add(jjj.class, jjj2);
-    }
 }
 

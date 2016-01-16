@@ -1,14 +1,3 @@
-/*
- * Decompiled with CFR 0_110.
- * 
- * Could not load the following classes:
- *  org.osbot.rs07.Bot
- *  org.osbot.rs07.api.Mouse
- *  org.osbot.rs07.api.Widgets
- *  org.osbot.rs07.api.ui.RS2Widget
- *  org.osbot.rs07.api.ui.Skill
- *  org.osbot.rs07.script.Script
- */
 package core;
 
 import org.osbot.rs07.api.ui.Skill;
@@ -19,21 +8,22 @@ import util.ExperienceTracker;
 import util.PriceAPI;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Core extends Script {
-    private DankHerb a;
-    private int b;
+    private DankHerb selectedHerb;
+    private int profitPerClean;
     private String cleanHerbName;
     private int herbsCleaned;
-    private int e;
+    private int cleanHerbPrice;
     private int[] cleanPattern;
-    private int g;
+    private int grimyHerbPrice;
     private List<State> states;
-    private int i;
+    private int cleanDelay;
     private long startTimeMillis;
     private ExperienceTracker expTracker;
     private String grimyHerbName;
@@ -46,20 +36,7 @@ public class Core extends Script {
         textualState = "";
         states = new ArrayList<>();
         herbsCleaned = 0;
-        i = 0;
-    }
-
-    static int setAndGetHerbsCleaned(Core core, int count) {
-        core.herbsCleaned = count;
-        return core.herbsCleaned;
-    }
-
-    static int getHerbsCleaned(Core core) {
-        return core.herbsCleaned;
-    }
-
-    static String getGrimyHerbName(Core core) {
-        return core.grimyHerbName;
+        cleanDelay = 0;
     }
 
     private static String formatElapsedTime(long elapsed) {
@@ -75,8 +52,16 @@ public class Core extends Script {
         return "" + hours + "hrs : " + minutes + "mins : " + seconds + "s";
     }
 
-    static MainFrame getMainFrame(Core core) {
-        return core.mainFrame;
+    public int getHerbsCleaned() {
+        return this.herbsCleaned;
+    }
+
+    public void setHerbsCleaned(int count) {
+        this.herbsCleaned = count;
+    }
+
+    public MainFrame getMainFrame() {
+        return this.mainFrame;
     }
 
     public final String getCleanHerbName() {
@@ -102,11 +87,11 @@ public class Core extends Script {
         return Core.random(200, 400);
     }
 
-    public final int b() {
-        return this.i;
+    public final int getCleanDelay() {
+        return this.cleanDelay;
     }
 
-    private void e() {
+    private void initializeUI() {
         this.mainFrame = new MainFrame();
         this.mainFrame.init();
         this.mainFrame.addWindowListener(new InstantCloseListener(this));
@@ -114,6 +99,7 @@ public class Core extends Script {
         this.mainFrame.setVisible(true);
     }
 
+    @Override
     public void onExit() {
     }
 
@@ -121,36 +107,38 @@ public class Core extends Script {
         return this.cleanPattern;
     }
 
-    private void setCleanPattern(int[] pattern) {
-        this.cleanPattern = pattern;
-    }
-
+    @Override
     public void onPaint(Graphics2D graphics2D) {
         this.runtimeMillis = System.currentTimeMillis() - this.startTimeMillis;
-        Object object = new Color(0, 0, 100, 120);
-        Color color = Color.GREEN;
-        graphics2D.setColor((Color) object);
+        graphics2D.setColor(new Color(0, 0, 100, 120));
         graphics2D.fillRect(25, 240, 350, 82);
-        graphics2D.setColor(color);
-        graphics2D.fillRect(25, 240, 3 * this.expTracker.a(Skill.HERBLORE), 9);
-        graphics2D.setFont(new Font("Monospaced", 0, 12));
+
+        graphics2D.setColor(Color.GREEN);
+        graphics2D.fillRect(25, 240, 3 * this.expTracker.getPercentageToNextLevel(Skill.HERBLORE), 9);
+
         graphics2D.setColor(Color.WHITE);
         graphics2D.drawRect(25, 240, 350, 9);
         graphics2D.drawRect(25, 240, 350, 82);
-        int n = (int) (3600000.0 / (double) (System.currentTimeMillis() - this.startTimeMillis) * (double) this.herbsCleaned);
-        String profitsPerHour = String.valueOf(n * this.b).replaceAll("(\\d)(?=(\\d{3})+$)", "$1,");
-        graphics2D.drawString(new StringBuilder().insert(0, "Herbs cleaned: ").append(this.herbsCleaned).append(" | (").append(n).append(")").toString(), 28, 260);
-        graphics2D.drawString(new StringBuilder().insert(0, "Current State: ").append(this.textualState).toString(), 28, 270);
-        graphics2D.drawString(new StringBuilder().insert(0, "Time running: ").append(Core.formatElapsedTime(this.runtimeMillis)).toString(), 28, 280);
-        graphics2D.drawString(new StringBuilder().insert(0, "XP Gained: ").append(this.expTracker.gained(Skill.HERBLORE)).append(" | (").append(this.expTracker.c(Skill.HERBLORE)).append(")").toString(), 28, 290);
-        graphics2D.drawString(new StringBuilder().insert(0, "XP/hr: ").append(this.expTracker.gainedPerHour(Skill.HERBLORE)).append(" | Profit/hr: ").append(profitsPerHour).toString(), 28, 300);
-        graphics2D.drawString(new StringBuilder().insert(0, "Time till next level: ").append(Core.formatElapsedTime(this.expTracker.d(Skill.HERBLORE))).toString(), 28, 310);
+
+        int cleanedPerHour = (int) (3600000.0 / (double) (System.currentTimeMillis() - this.startTimeMillis) * (double) this.herbsCleaned);
+        String profitsPerHour = String.valueOf(cleanedPerHour * this.profitPerClean).replaceAll("(\\d)(?=(\\d{3})+$)", "$1,");
+
+        graphics2D.setFont(new Font("Monospaced", 0, 12));
+        graphics2D.drawString("Herbs cleaned: " + this.herbsCleaned + " | (" + cleanedPerHour + ")", 28, 260);
+        graphics2D.drawString("Current State: " + this.textualState, 28, 270);
+        graphics2D.drawString("Time running: " + Core.formatElapsedTime(this.runtimeMillis), 28, 280);
+        graphics2D.drawString("XP Gained: " + this.expTracker.getExperienceGained(Skill.HERBLORE) + (" | (" + this.expTracker.getLevelsGained(Skill.HERBLORE) + ")"), 28, 290);
+        graphics2D.drawString("XP/hr: " + this.expTracker.gainedPerHour(Skill.HERBLORE) + " | Profit/hr: " + profitsPerHour, 28, 300);
+        graphics2D.drawString("Time till next level: " + Core.formatElapsedTime(this.expTracker.timeUntilNextLevel(Skill.HERBLORE)), 28, 310);
+
         graphics2D.drawLine((int) this.getMouse().getPosition().getX(), (int) this.getMouse().getPosition().getY() + 10, (int) this.getMouse().getPosition().getX(), (int) this.getMouse().getPosition().getY() - 10);
         graphics2D.drawLine((int) this.getMouse().getPosition().getX() + 10, (int) this.getMouse().getPosition().getY(), (int) this.getMouse().getPosition().getX() - 10, (int) this.getMouse().getPosition().getY());
+
         graphics2D.setColor(Color.RED);
         graphics2D.drawString("by Chicken Wing      v1.0", 70, 320);
     }
 
+    @Override
     public void onStart() {
         if (!this.widgets.get(548, 61).isVisible()) {
             this.widgets.get(548, 48).interact();
@@ -158,16 +146,16 @@ public class Core extends Script {
 
         getBot().addMouseListener(new RetardMouseListener(this));
         this.expTracker = new ExperienceTracker(this);
-        expTracker.startTracking(new Skill[]{Skill.HERBLORE});
-        EventQueue.invokeLater(this::e);
+        expTracker.startTracking(Skill.HERBLORE);
+        EventQueue.invokeLater(this::initializeUI);
 
-        this.cleanPattern = this.mainFrame.a();
-        a = mainFrame.getSelectedHerb();
-        log(new StringBuilder().insert(0, a.getCleanName()).append(" ").append(this.a.getGrimyName()).toString());
-        cleanHerbName = a.getCleanName();
-        grimyHerbName = a.getGrimyName();
-        i = mainFrame.b();
-        log("Delay set: " + this.i + "ms");
+        this.cleanPattern = this.mainFrame.getCleanPattern();
+        this.selectedHerb = this.mainFrame.getSelectedHerb();
+        log(selectedHerb + " " + this.selectedHerb.getGrimyName());
+        this.cleanHerbName = this.selectedHerb.getCleanName();
+        this.grimyHerbName = this.selectedHerb.getGrimyName();
+        this.cleanDelay = this.mainFrame.getCleanDelay();
+        log("Delay set: " + this.cleanDelay + "ms");
 
         String textualPattern = "";
         for (int i = 0; i < cleanPattern.length; i++) {
@@ -175,15 +163,31 @@ public class Core extends Script {
             textualPattern += " ";
             textualPattern += cleanPattern[i];
         }
-
         log("Pattern: " + textualPattern);
-        startTimeMillis = System.currentTimeMillis();
-        Collections.addAll(states, new OpenBankState(this), new CloseBankState(this), new DepositItemsState(this), new CleanHerbsState(this), new WithdrawItemsState(this), new LogoutState(this));
+
+        this.startTimeMillis = System.currentTimeMillis();
+
+        Collections.addAll(states,
+                new OpenBankState(this),
+                new CloseBankState(this),
+                new DepositItemsState(this),
+                new CleanHerbsState(this),
+                new WithdrawItemsState(this),
+                new LogoutState(this)
+        );
+
         this.mainFrame.dispose();
-        PriceAPI var2_34 = new PriceAPI();
-        this.e = var2_34.c(this.a.getGrimyId());
-        b = e - g;
-        new HerbsCleanedItemTracker(this, this).start();
+
+        try {
+            this.cleanHerbPrice = PriceAPI.getSellingPrice(this.selectedHerb.getCleanId());
+            this.grimyHerbPrice = PriceAPI.getBuyingPrice(this.selectedHerb.getGrimyId());
+        } catch (IOException e1) {
+            e1.printStackTrace();
+            this.cleanHerbPrice = 0;
+        }
+
+        this.profitPerClean = this.cleanHerbPrice - this.grimyHerbPrice;
+        new HerbsCleanedItemTracker(this).start();
     }
 
     public final String getGrimyHerbName() {

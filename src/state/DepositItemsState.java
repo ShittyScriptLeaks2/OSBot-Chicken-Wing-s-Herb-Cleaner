@@ -10,19 +10,19 @@ public final class DepositItemsState extends State {
     }
 
     @Override
-    public final boolean onLoop() {
+    public boolean onLoop() {
         this.parent.widgets.get(12, 27).interact("Deposit inventory");
         new DepositGrimyHerbsCondition(this).sleep();
         return true;
     }
 
     @Override
-    public final String getTextualState() {
+    public String getTextualState() {
         return "Depositing " + this.parent.getGrimyHerbName();
     }
 
     @Override
-    public final boolean shouldExecute() {
+    public boolean shouldExecute() {
         if (!this.parent.bank.isOpen()) {
             return false;
         }

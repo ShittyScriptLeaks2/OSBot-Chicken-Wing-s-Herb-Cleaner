@@ -9,8 +9,8 @@ public final class ExperienceTrackerNode {
     private final int staticLevel;
 
     public ExperienceTrackerNode(ExperienceTracker parent, Skill skill) {
-        this.experience = ExperienceTracker.a(parent).skills.getExperience(skill);
-        this.staticLevel = ExperienceTracker.a(parent).skills.getStatic(skill);
+        this.experience = parent.getScript().skills.getExperience(skill);
+        this.staticLevel = parent.getScript().skills.getStatic(skill);
         this.startTime = System.currentTimeMillis();
     }
 
@@ -29,5 +29,6 @@ public final class ExperienceTrackerNode {
     public final int getStaticLevel() {
         return this.staticLevel;
     }
+
 }
 

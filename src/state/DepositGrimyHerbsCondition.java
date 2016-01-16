@@ -11,7 +11,7 @@ public final class DepositGrimyHerbsCondition extends ConditionalSleep {
         this.parent = parent;
     }
 
-    public final boolean condition() {
+    public boolean condition() {
         if (this.parent.parent.inventory.contains(this.parent.parent.getGrimyHerbName())) {
             return false;
         }

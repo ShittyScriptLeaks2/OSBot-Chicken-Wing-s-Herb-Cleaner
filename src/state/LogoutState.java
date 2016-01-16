@@ -10,7 +10,7 @@ public final class LogoutState extends State {
     }
 
     @Override
-    public final boolean shouldExecute() {
+    public boolean shouldExecute() {
         if (!this.parent.bank.isOpen()) {
             return false;
         }
@@ -23,7 +23,7 @@ public final class LogoutState extends State {
     }
 
     @Override
-    public final boolean onLoop() {
+    public boolean onLoop() {
         this.parent.getLogoutTab().logOut();
         new WaitForLogoutCondition(this).sleep();
         parent.log("Ran out of Items, logging out..");
@@ -32,7 +32,7 @@ public final class LogoutState extends State {
     }
 
     @Override
-    public final String getTextualState() {
+    public String getTextualState() {
         return "Logging out";
     }
 

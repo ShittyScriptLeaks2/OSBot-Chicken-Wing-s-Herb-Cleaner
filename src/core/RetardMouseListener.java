@@ -13,25 +13,29 @@ public final class RetardMouseListener implements BotMouseListener {
         this.parent = parent;
     }
 
-    public final boolean blockInput(Point point) {
+    public boolean blockInput(Point point) {
         return false;
     }
 
-    public final void mouseEntered(MouseEvent mouseEvent) {
+    @Override
+    public void mouseEntered(MouseEvent mouseEvent) {
     }
 
-    public final void mousePressed(MouseEvent mouseEvent) {
+    @Override
+    public void mousePressed(MouseEvent mouseEvent) {
     }
 
-    public final void mouseReleased(MouseEvent mouseEvent) {
+    @Override
+    public void mouseReleased(MouseEvent mouseEvent) {
     }
 
-    public final void mouseExited(MouseEvent mouseEvent) {
+    @Override
+    public void mouseExited(MouseEvent mouseEvent) {
     }
 
-    public final void mouseClicked(MouseEvent mouseEvent) {
+    @Override
+    public void mouseClicked(MouseEvent mouseEvent) {
         this.parent.getBot().addPainter(graphics2D -> {
-
         });
     }
 

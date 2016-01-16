@@ -4,15 +4,15 @@ import java.util.EventObject;
 
 public final class PatternEventObject extends EventObject {
 
-    private int[] a;
+    private final int[] cleanPattern;
 
-    public PatternEventObject(Object object, int[] arrn) {
+    public PatternEventObject(Object object, int[] pattern) {
         super(object);
-        this.a = arrn;
+        this.cleanPattern = pattern;
     }
 
-    public final int[] a() {
-        return this.a;
+    public int[] getCleanPattern() {
+        return this.cleanPattern;
     }
 
 }

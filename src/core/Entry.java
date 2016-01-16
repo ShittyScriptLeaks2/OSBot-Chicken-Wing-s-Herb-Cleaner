@@ -2,12 +2,15 @@ package core;
 
 import ui.MainFrame;
 
-public class Entry {
+public final class Entry {
+
+    private Entry() {
+    }
 
     public static void main(String[] object) {
-        MainFrame object2 = new MainFrame();
-        object2.init();
-        object2.setVisible(true);
+        MainFrame frame = new MainFrame();
+        frame.init();
+        frame.setVisible(true);
     }
 
 }

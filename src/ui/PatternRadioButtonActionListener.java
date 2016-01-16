@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0_110.
- */
 package ui;
 
 import java.awt.event.ActionEvent;
@@ -21,18 +18,21 @@ public final class PatternRadioButtonActionListener implements ActionListener {
             parent.repaint();
             parent.revalidate();
             MainFrame.a(parent).setText("No custom pattern set");
-            MainFrame.a(parent, MainFrame.c(this.parent));
-            if (MainFrame.b(parent) == null) return;
-            MainFrame.b(parent).dispose();
-            MainFrame.a(parent, (int[]) null);
+            MainFrame.setCleanPattern(parent, MainFrame.getDefaultCleanPattern(this.parent));
+            if (parent.getSelectPatternFrame() == null) {
+                return;
+            }
+
+            parent.getSelectPatternFrame().dispose();
+            MainFrame.setCleanPattern(parent, null);
             return;
         }
 
         MainFrame.a(parent, false);
-        if (MainFrame.b(parent) == null) {
-            MainFrame.a(this.parent, new SelectPatternFrame());
-            MainFrame.b(parent).setVisible(true);
-            MainFrame.b(parent).a(new mmm(this));
+        if (parent.getSelectPatternFrame() == null) {
+            parent.setSelectPatternFrame(new SelectPatternFrame());
+            parent.getSelectPatternFrame().setVisible(true);
+            parent.getSelectPatternFrame().addEventListener(new FinishedPatternEventListener(this));
         }
 
         parent.repaint();

@@ -8,7 +8,7 @@ import org.osbot.rs07.script.MethodProvider;
 
 public final class CleanHerbsState extends State {
 
-    private int[] pattern;
+    private final int[] pattern;
 
     public CleanHerbsState(Core parent) {
         super(parent);
@@ -16,7 +16,7 @@ public final class CleanHerbsState extends State {
     }
 
     @Override
-    public final boolean shouldExecute() {
+    public boolean shouldExecute() {
         if (this.parent.bank.isOpen()) {
             return false;
         }
@@ -29,35 +29,29 @@ public final class CleanHerbsState extends State {
     }
 
     @Override
-    public final boolean onLoop() throws InterruptedException {
-        int n;
-        int n2 = n = 0;
-        do {
-            if (n2 >= 28) {
-                new WaitForCleaningCondition(this).sleep();
-                return true;
-            }
-
-            if (this.parent.inventory.getItemInSlot(this.pattern[n]) != null && this.parent.inventory.getItemInSlot(this.pattern[n]).getName().equals(this.parent.getCleanHerbName())) {
-                MouseDestination mouseDestination = this.parent.inventory.getMouseDestination(this.pattern[n]);
+    public boolean onLoop() throws InterruptedException {
+        for (int i = 0; i < 28; i++) {
+            if (this.parent.inventory.getItemInSlot(this.pattern[i]) != null && this.parent.inventory.getItemInSlot(this.pattern[i]).getName().equals(this.parent.getCleanHerbName())) {
+                MouseDestination mouseDestination = this.parent.inventory.getMouseDestination(this.pattern[i]);
                 MoveMouseEvent moveMouseEvent = new MoveMouseEvent(mouseDestination);
                 if (mouseDestination != null) {
                     this.parent.execute(moveMouseEvent);
-                    MethodProvider.sleep((long) MethodProvider.random(0, this.parent.b() / 2));
+                    MethodProvider.sleep((long) MethodProvider.random(0, this.parent.getCleanDelay() / 2));
                     this.parent.mouse.click(false);
                 }
 
-                if (this.parent.b() > 0) {
-                    MethodProvider.sleep((long) MethodProvider.random(0, this.parent.b() / 2));
+                if (this.parent.getCleanDelay() > 0) {
+                    MethodProvider.sleep((long) MethodProvider.random(0, this.parent.getCleanDelay() / 2));
                 }
             }
+        }
 
-            n2 = ++n;
-        } while (true);
+        new WaitForCleaningCondition(this).sleep();
+        return true;
     }
 
     @Override
-    public final String getTextualState() {
+    public String getTextualState() {
         return "Cleaning " + this.parent.getCleanHerbName();
     }
 

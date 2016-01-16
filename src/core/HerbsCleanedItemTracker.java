@@ -1,24 +1,23 @@
 package core;
 
-import org.osbot.rs07.script.Script;
 import util.ItemTracker;
 
 public final class HerbsCleanedItemTracker extends ItemTracker {
 
-    private Core parent;
+    private final Core parent;
 
-    public HerbsCleanedItemTracker(Core parent, Script script) {
-        super(script);
+    public HerbsCleanedItemTracker(Core parent) {
+        super(parent);
         this.parent = parent;
     }
 
     @Override
-    public final int onTick() {
-        if (getChangedAmount(Core.getGrimyHerbName(parent)) <= 0) {
+    public int onTick() {
+        if (getChangedAmount(parent.getGrimyHerbName()) <= 0) {
             return 100;
         }
 
-        Core.setAndGetHerbsCleaned(parent, Core.getHerbsCleaned(parent) + getChangedAmount(Core.getGrimyHerbName(parent)));
+        parent.setHerbsCleaned(parent.getHerbsCleaned() + getChangedAmount(parent.getGrimyHerbName()));
         return 100;
     }
 
